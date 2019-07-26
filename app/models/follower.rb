@@ -1,5 +1,5 @@
 class Follower
-    attr_accessor :name, :age, :life_motto, :cults 
+    attr_accessor :name, :age, :life_motto
     
     @@all = []
 
@@ -7,22 +7,33 @@ class Follower
         @@all 
     end
 
-    def self.of_a_certain_age(age)
-        self.all.select{|follower| follower.age >= age}
+    def self.of_a_certain_age(age_floor)
+       Follower.all.select{|f| f.age >= age_floor} 
     end
 
-    def initialize(name, age, life_motto)
-        self.name = name
-        self.age = age
-        self.life_motto = life_motto
-        self.cults = []
+    def self.most_active
+        max_cults = Follower.all.map{|f| f.cults.length}.max 
+        Follower.all.select{|f| f.cults.length == max_cults}  
+    end
+
+    # def self.top_ten
+        
+    # end
+
+    def initialize(props={})
+        self.name = props[:name]
+        self.age = props[:age]
+        self.life_motto = props[:life_motto]
         @@all << self 
     end
 
-    def join_cult(new_cult)
-        cult_to_join = Cult.all.find{|cult| new_cult == cult} 
-        cult_to_join.followers << self  
-        self.cults << cult_to_join    
+    def cults
+        f_cults = BloodOath.all.select{|o| o.follower == self}
+        f_cults.map{|o| o.cult}
+    end
+
+    def join_cult(cult_instance)
+        BloodOath.new(follower: self, cult: cult_instance)
     end
 
     def my_cults_slogans
